@@ -10,6 +10,7 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.TST;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -50,6 +51,10 @@ public class BoggleSolver {
         return s;
     }
 
+    private String getKeyForHelpers(String originalWord) {
+        return originalWord.substring(0, 2);
+    }
+
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board) {
         HashSet<String> wordsSoFar = new HashSet<>();
@@ -71,14 +76,27 @@ public class BoggleSolver {
         WordAndHistory curr;
         List<Integer> newPosition;
         HashSet<List<Integer>> newHistory;
+        HashMap<String, TST<String>> helperWords = new HashMap<>();
+        TST<String> tst;
         int x, y;
         while (!used.isEmpty()) {
             curr = used.pop();
-            if (words.contains(curr.word) && curr.word.length() >= 3) {
-                wordsSoFar.add(curr.word);
-            }
-            if (!words.keysWithPrefix(curr.word).iterator().hasNext()) {
-                continue;
+            if (curr.word.length() >= 3) {
+                String key = getKeyForHelpers(curr.word);
+                tst = helperWords.get(key);
+                if (tst == null) {
+                    tst = new TST<String>();
+                    helperWords.put(key, tst);
+                    for (String word : words.keysWithPrefix(key)) {
+                        tst.put(word, word);
+                    }
+                }
+                if (tst.contains(curr.word)) {
+                    wordsSoFar.add(curr.word);
+                }
+                if (!tst.keysWithPrefix(curr.word).iterator().hasNext()) {
+                    continue;
+                }
             }
             x = curr.lastPosition.get(0);
             y = curr.lastPosition.get(1);
@@ -104,6 +122,13 @@ public class BoggleSolver {
                 }
             }
         }
+        // for (String key : helperWords.keySet()) {
+        //     StdOut.println(key);
+        // }
+        //
+        // for (String key : helperWords.get("TA").keys()) {
+        //     StdOut.println(key);
+        // }
         return wordsSoFar;
     }
 
