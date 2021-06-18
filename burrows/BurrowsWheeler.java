@@ -36,26 +36,27 @@ public class BurrowsWheeler {
         while (!BinaryStdIn.isEmpty()) {
             list.add(BinaryStdIn.readChar());
         }
-        ArrayList<Character> sortedList = new ArrayList<>(list);
-        Collections.sort(sortedList);
+        int radix = 256;
+        int[] count = new int[radix];
+        int[] pointers = new int[radix];
         int[] next = new int[list.size()];
-        HashSet<Integer> used = new HashSet<>();
-        for (int i = 0; i < list.size(); i++) {
-            for (int j = 0; j < list.size(); j++) {
-                if (
-                    list.get(j) == sortedList.get(i)
-                    && !used.contains(j)
-                ) {
-                    used.add(j);
-                    next[i] = j;
-                    break;
-                }
-            }
+
+        for (char c: list) {
+            count[c] += 1;
         }
-        BinaryStdOut.write(sortedList.get(zerosIndex));
-        int runningIndex = next[zerosIndex];
+        for (char c = 1; c < radix; c++) {
+            pointers[c] = pointers[c - 1] + count[c - 1];
+        }
+        for (int i = 0; i < list.size(); i++) {
+            char c = list.get(i);
+            next[pointers[c]] = i;
+            pointers[c] += 1;
+        }
+        int runningIndex = zerosIndex;
+        BinaryStdOut.write(list.get(runningIndex));
+        runningIndex = next[runningIndex];
         while (runningIndex != zerosIndex) {
-            BinaryStdOut.write(sortedList.get(runningIndex));
+            BinaryStdOut.write(list.get(runningIndex));
             runningIndex = next[runningIndex];
         }
         BinaryStdOut.flush();
