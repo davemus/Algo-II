@@ -53,11 +53,9 @@ public class BurrowsWheeler {
             pointers[c] += 1;
         }
         int runningIndex = zerosIndex;
-        BinaryStdOut.write(list.get(runningIndex));
-        runningIndex = next[runningIndex];
-        while (runningIndex != zerosIndex) {
-            BinaryStdOut.write(list.get(runningIndex));
+        for (int i=0; i < list.size(); i++) {
             runningIndex = next[runningIndex];
+            BinaryStdOut.write(list.get(runningIndex));
         }
         BinaryStdOut.flush();
     }
