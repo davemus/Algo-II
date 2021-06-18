@@ -7,6 +7,30 @@ public class CircularSuffixArray {
     private final int pLength;
     private final int[] indexes;
 
+    private class StringWithOffset implements Comparable<StringWithOffset> {
+        private final int offset;
+        private final String string;
+
+        public StringWithOffset(String string, int offset) {
+            this.string = string;
+            this.offset = offset;
+        }
+
+        public int compareTo(StringWithOffset other) {
+            for (int i = 0; i < string.length(); i++) {
+                char c1 = string.charAt((i + offset) % string.length());
+                char c2 = other.string.charAt((i + other.offset) % other.string.length());
+                if (c1 < c2) {
+                    return -1;
+                }
+                if (c1 > c2) {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+    }
+
     // circular suffix array of s
     public CircularSuffixArray(String s) {
         if (null == s) {
@@ -14,15 +38,13 @@ public class CircularSuffixArray {
         }
         pLength = s.length();
         indexes = new int[pLength];
-        String[] strings = new String[pLength];
-        HashMap<String, Integer> initialPositions = new HashMap<>();
+        StringWithOffset[] strings = new StringWithOffset[pLength];
         for (int i=0; i < pLength; i++) {
-            strings[i] = s.substring(i, pLength) + s.substring(0, i);
-            initialPositions.put(strings[i], i);
+            strings[i] = new StringWithOffset(s, i);
         }
         Arrays.sort(strings);
         for (int i=0; i<pLength; i++) {
-            indexes[i] = initialPositions.get(strings[i]);
+            indexes[i] = strings[i].offset;
         }
     }
 
